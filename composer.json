@@ -1,0 +1,22 @@
+{
+  "name": "evalok/php-event-router",
+  "description" : "for routing",
+  "keywords": ["events", "hooks", "routing"],
+  "license": "MIT",
+  "author": {
+    "name": "Eva Lok",
+    "email": "squidstock@hotmail.com",
+    "homepage" : "https://github.com/EvaLok/php-event-router"
+  },
+  "require": {
+    "php" : ">=5.5.0"
+  },
+  "require-dev": {
+    "phpspec/phpspec": "~2.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "EventRouter\\": "src"
+    }
+  }
+}
