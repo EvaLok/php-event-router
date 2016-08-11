@@ -1,6 +1,6 @@
 <?php
 
-namespace Aedea\v2\Hooks;
+namespace EventRouter\v1;
 
 class Handler
 {

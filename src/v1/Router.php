@@ -1,9 +1,9 @@
 <?php
 
-namespace Aedea\v2\Hooks;
+namespace EventRouter\v1;
 
-use Aedea\v2\Hooks\Event;
-use Aedea\v2\Hooks\Handler;
+use EventRouter\v1\Event;
+use EventRouter\v1\Handler;
 
 class Router
 {
@@ -11,7 +11,7 @@ class Router
 
 	protected $handlers = [];
 
-	public function __construct( $cfg = [] )
+	public function __construct()
 	{
 		static::$instance = $this;
 
@@ -21,7 +21,7 @@ class Router
 	/**
 	 * triggers registered handlers for a particular event name (passes data)
 	 *
-	 * @param \Aedea\v2\Hooks\Event $event
+	 * @param \EventRouter\v1\Event $event
 	 *
 	 * @return array $results
 	 */
@@ -46,7 +46,7 @@ class Router
 	 * binds the handler to all aliases supplied
 	 *
 	 * @param array $aliases
-	 * @param \Aedea\v2\Hooks\Handler $handler
+	 * @param \EventRouter\v1\Handler $handler
 	 *
 	 * @return $this;
 	 */
