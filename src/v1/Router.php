@@ -34,7 +34,7 @@ class Router
 		} else {
 			foreach( $this->handlers[$event->getName()] as $handler ){
 				$results[$handler->getName()] = (
-					call_user_func($handler->handle, $event->getData())
+					$handler->handle($event->getData())
 				);
 			}
 		}
@@ -53,7 +53,7 @@ class Router
 	public function registerHandler( Array $aliases, Handler $handler )
 	{
 		foreach( $aliases as $alias ){
-			if( ! is_array($this->handlers[$alias]) ){
+			if( ! array_key_exists($alias, $this->handlers) ){
 				$this->handlers[$alias] = [];
 			}
 
@@ -72,5 +72,9 @@ class Router
 			:
 			new static
 		);
+	}
+
+	public function getHandlers(){
+		return $this->handlers;
 	}
 }
