@@ -15,7 +15,7 @@ class RouterSpec extends ObjectBehavior
         $this->shouldHaveType('EventRouter\v1\Router');
     }
 
-    function it_should_register_event_handler_properly()
+    function it_should_register_event_handler()
     {
     	$handler1 = (new Handler(
 		    'test.handler.1',
@@ -43,7 +43,7 @@ class RouterSpec extends ObjectBehavior
 	    $results['test.handler.1']['count']->shouldEqual(16);
     }
 
-	function it_should_register_multiple_event_handlers_properly()
+	function it_should_register_multiple_event_handlers()
 	{
 		$handler1 = (new Handler(
 			'test.handler.1',
@@ -84,5 +84,86 @@ class RouterSpec extends ObjectBehavior
 
 		$results['test.handler.1']['count']->shouldEqual(16);
 		$results['test.handler.2']['count']->shouldEqual(101);
+	}
+
+	function it_should_register_event_handler_for_multiple_events()
+	{
+		$handler1 = (new Handler(
+			'test.handler.1',
+			function( $data ){
+				$data['count'] += 15;
+
+				return $data;
+			})
+		);
+
+		$events = [
+			'test.event.1',
+			'test.event.2',
+			'test.event.3'
+		];
+
+		$this->registerHandler($events, $handler1);
+
+		$handlers = $this->getHandlers();
+
+		foreach( $events as $event ){
+			$handlers[$event][0]
+				->shouldHaveType('EventRouter\v1\Handler');
+
+			$handlers[$event][0]->getName()
+				->shouldBe('test.handler.1');
+
+			$results = $this->handleEvent(
+				new Event($event, ['count' => 1])
+			);
+
+			$results['test.handler.1']['count']->shouldEqual(16);
+		}
+	}
+
+	function it_should_not_handle_unregistered_events()
+	{
+		$handler1 = (new Handler(
+			'test.handler.1',
+			function( $data ){
+				$data['count'] += 15;
+
+				return $data;
+			})
+		);
+
+		$events = [
+			'test.event.1',
+			'test.event.2',
+			'test.event.3'
+		];
+
+		$this->registerHandler([
+			'test.event.1',
+			'test.event.3'
+		], $handler1);
+
+		foreach( $events as $event ){
+			switch( $event ){
+				case 'test.event.1':
+				case 'test.event.3':
+					$results = $this->handleEvent(
+						new Event($event, ['count' => 1])
+					);
+
+					$results['test.handler.1']['count']->shouldEqual(16);
+					break;
+
+				case 'test.event.2':
+					$results = $this->handleEvent(
+						new Event($event, ['count' => 1])
+					);
+
+					$results->shouldBe([]);
+
+					break;
+			}
+		}
 	}
 }

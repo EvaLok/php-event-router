@@ -29,8 +29,11 @@ class Router
 	{
 		$results = [];
 
-		if( ! is_array($this->handlers[$event->getName()]) ){
-			trigger_error("unknown event {$event->getName()}", E_NOTICE);
+		if( ! array_key_exists($event->getName(), $this->handlers) ){
+			// no handlers registered
+			// @todo: maybe send a notice (currently conflicts with tests)
+			// so not sending notice currently
+			// .. maybe try something like a "strict mode"?
 		} else {
 			foreach( $this->handlers[$event->getName()] as $handler ){
 				$results[$handler->getName()] = (
