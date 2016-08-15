@@ -8,6 +8,7 @@ simple event router with Router, Event, and Handler objects
 
 # example usage
 ```php
+// set handlers..
 $handler1 = (new Handler(
 	'test.handler.1',
 	function( $data ){
@@ -22,17 +23,12 @@ $handler2 = (new Handler(
 		return $data;
 	})
 );
+
+// register handlers for specific events (in this case, test.event.1)
 $this->registerHandler(['test.event.1'], $handler1);
 $this->registerHandler(['test.event.1'], $handler2);
-$handlers = $this->getHandlers();
-$handlers['test.event.1'][0]
-	->shouldHaveType('EventRouter\v1\Handler');
-$handlers['test.event.1'][1]
-	->shouldHaveType('EventRouter\v1\Handler');
-$handlers['test.event.1'][0]->getName()
-	->shouldBe('test.handler.1');
-$handlers['test.event.1'][1]->getName()
-	->shouldBe('test.handler.2');
+
+// trigger the handler, and grab the results if you need them
 $results = $this->handleEvent(
 	new Event('test.event.1', ['count' => 1])
 );
