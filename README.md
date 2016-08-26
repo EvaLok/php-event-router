@@ -39,6 +39,7 @@ $router->registerHandler(['test.event.1'], $handler2);
 $results = $router->handleEvent(
 	new Event('test.event.1', ['count' => 1])
 );
-$results['test.handler.1']['count']->shouldEqual(16);
-$results['test.handler.2']['count']->shouldEqual(101);
+
+echo $results['test.handler.1']['count']; // 16
+echo $results['test.handler.2']['count']; // 101
 ```
