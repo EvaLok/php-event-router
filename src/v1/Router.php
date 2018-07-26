@@ -4,6 +4,7 @@ namespace EventRouter\v1;
 
 use EventRouter\v1\Event;
 use EventRouter\v1\Handler;
+use EventRouter\v1\Router\Exception\UnknownEventName;
 
 class Router
 {
@@ -18,22 +19,20 @@ class Router
 		return $this;
 	}
 
-	/**
-	 * triggers registered handlers for a particular event name (passes data)
-	 *
-	 * @param \EventRouter\v1\Event $event
-	 *
-	 * @return array $results
-	 */
+    /**
+     * triggers registered handlers for a particular event name (passes data)
+     *
+     * @param \EventRouter\v1\Event $event
+     *
+     * @return array $results
+     * @throws UnknownEventName
+     */
 	public function handleEvent( Event $event )
 	{
 		$results = [];
 
 		if( ! array_key_exists($event->getName(), $this->handlers) ){
-			// no handlers registered
-			// @todo: maybe send a notice (currently conflicts with tests)
-			// so not sending notice currently
-			// .. maybe try something like a "strict mode"?
+		    throw new UnknownEventName($event->getName());
 		} else {
 			foreach( $this->handlers[$event->getName()] as $handler ){
 				$results[$handler->getName()] = (

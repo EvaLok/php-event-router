@@ -2,6 +2,7 @@
 
 namespace spec\EventRouter\v1;
 
+use EventRouter\v1\Router\Exception\UnknownEventName;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
@@ -156,14 +157,47 @@ class RouterSpec extends ObjectBehavior
 					break;
 
 				case 'test.event.2':
-					$results = $this->handleEvent(
-						new Event($event, ['count' => 1])
-					);
+				    $event = new Event($event, ['count' => 1]);
 
-					$results->shouldBe([]);
+				    $this
+                        ->shouldThrow('EventRouter\v1\Router\Exception\UnknownEventName')
+                        ->duringHandleEvent($event);
+
+				    try {
+                        $this->handleEvent($event);
+
+                        throw new \Exception("should not get here");
+                    }
+
+                    catch ( UnknownEventName $ex ) {
+				        // we expect this exception
+                    }
 
 					break;
 			}
 		}
 	}
+
+	function it_should_error_if_unknown_event_type_passed_to_router() {
+        $eventWithNoHandler = new Event(
+            "event.no.handler",
+            [
+                'some' => 'data'
+            ]
+        );
+
+        $this
+            ->shouldThrow('EventRouter\v1\Router\Exception\UnknownEventName')
+            ->duringHandleEvent($eventWithNoHandler);
+
+        try {
+            $this->handleEvent($eventWithNoHandler);
+
+            throw new \Exception("should not get here");
+        }
+
+        catch ( UnknownEventName $ex ) {
+            // we expect this exception
+        }
+    }
 }
