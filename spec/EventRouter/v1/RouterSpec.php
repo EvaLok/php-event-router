@@ -2,6 +2,7 @@
 
 namespace spec\EventRouter\v1;
 
+use EventRouter\v1\Router\Exception\UnknownEventName;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
@@ -10,38 +11,38 @@ use EventRouter\v1\Event;
 
 class RouterSpec extends ObjectBehavior
 {
-    function it_is_initializable()
-    {
-        $this->shouldHaveType('EventRouter\v1\Router');
-    }
+	function it_is_initializable()
+	{
+		$this->shouldHaveType('EventRouter\v1\Router');
+	}
 
-    function it_should_register_event_handler()
-    {
-    	$handler1 = (new Handler(
-		    'test.handler.1',
-		    function( $data ){
-		    	$data['count'] += 15;
+	function it_should_register_event_handler()
+	{
+		$handler1 = (new Handler(
+			'test.handler.1',
+			function( $data ){
+				$data['count'] += 15;
 
-			    return $data;
-		    })
-	    );
+				return $data;
+			})
+		);
 
-    	$this->registerHandler(['test.event.1'], $handler1);
+		$this->registerHandler(['test.event.1'], $handler1);
 
-	    $handlers = $this->getHandlers();
+		$handlers = $this->getHandlers();
 
-	    $handlers['test.event.1'][0]
-		    ->shouldHaveType('EventRouter\v1\Handler');
+		$handlers['test.event.1'][0]
+			->shouldHaveType('EventRouter\v1\Handler');
 
-	    $handlers['test.event.1'][0]->getName()
-		    ->shouldBe('test.handler.1');
+		$handlers['test.event.1'][0]->getName()
+			->shouldBe('test.handler.1');
 
 		$results = $this->handleEvent(
 			new Event('test.event.1', ['count' => 1])
 		);
 
-	    $results['test.handler.1']['count']->shouldEqual(16);
-    }
+		$results['test.handler.1']['count']->shouldEqual(16);
+	}
 
 	function it_should_register_multiple_event_handlers()
 	{
@@ -156,14 +157,47 @@ class RouterSpec extends ObjectBehavior
 					break;
 
 				case 'test.event.2':
-					$results = $this->handleEvent(
-						new Event($event, ['count' => 1])
-					);
+					$event = new Event($event, ['count' => 1]);
 
-					$results->shouldBe([]);
+					$this
+						->shouldThrow('EventRouter\v1\Router\Exception\UnknownEventName')
+						->duringHandleEvent($event);
+
+					try {
+						$this->handleEvent($event);
+
+						throw new \Exception("should not get here");
+					}
+
+					catch ( UnknownEventName $ex ) {
+						// we expect this exception
+					}
 
 					break;
 			}
+		}
+	}
+
+	function it_should_error_if_unknown_event_type_passed_to_router() {
+		$eventWithNoHandler = new Event(
+			"event.no.handler",
+			[
+				'some' => 'data'
+			]
+		);
+
+		$this
+			->shouldThrow('EventRouter\v1\Router\Exception\UnknownEventName')
+			->duringHandleEvent($eventWithNoHandler);
+
+		try {
+			$this->handleEvent($eventWithNoHandler);
+
+			throw new \Exception("should not get here");
+		}
+
+		catch ( UnknownEventName $ex ) {
+			// we expect this exception
 		}
 	}
 }

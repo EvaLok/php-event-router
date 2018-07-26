@@ -4,12 +4,12 @@
   "keywords": ["events", "hooks", "routing"],
   "license": "MIT",
   "author": {
-    "name": "Eva Lok",
-    "email": "squidstock@hotmail.com",
+    "name": "Eva Beekers",
+    "email": "eva.aedea@gmail.com",
     "homepage" : "https://github.com/EvaLok/php-event-router"
   },
   "require": {
-    "php" : ">=5.5.0"
+    "php" : ">=7.0.0"
   },
   "require-dev": {
     "phpspec/phpspec": "~2.0"
