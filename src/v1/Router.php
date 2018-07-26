@@ -19,20 +19,20 @@ class Router
 		return $this;
 	}
 
-    /**
-     * triggers registered handlers for a particular event name (passes data)
-     *
-     * @param \EventRouter\v1\Event $event
-     *
-     * @return array $results
-     * @throws UnknownEventName
-     */
+	/**
+	 * triggers registered handlers for a particular event name (passes data)
+	 *
+	 * @param \EventRouter\v1\Event $event
+	 *
+	 * @return array $results
+	 * @throws UnknownEventName
+	 */
 	public function handleEvent( Event $event )
 	{
 		$results = [];
 
 		if( ! array_key_exists($event->getName(), $this->handlers) ){
-		    throw new UnknownEventName($event->getName());
+			throw new UnknownEventName($event->getName());
 		} else {
 			foreach( $this->handlers[$event->getName()] as $handler ){
 				$results[$handler->getName()] = (
