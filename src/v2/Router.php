@@ -40,7 +40,7 @@ class Router
 	/**
 	 * binds the handler to all aliases supplied
 	 */
-	public function registerHandler( Array $aliases, Handler $handler )
+	public function registerHandler( Array $aliases, Handler $handler ): void
 	{
 		foreach( $aliases as $alias ){
 			if( ! array_key_exists($alias, $this->handlers) ){
