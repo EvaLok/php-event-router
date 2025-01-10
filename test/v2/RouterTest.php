@@ -240,6 +240,9 @@ class RouterTest extends TestCase
 					$result = $router->handleEvent($event);
 					$this->assertEquals(30, $result[$multiHandler::class]->count);
 					break;
+
+				default:
+					throw new \Exception("should not reach here");
 			}
 		}
 	}
