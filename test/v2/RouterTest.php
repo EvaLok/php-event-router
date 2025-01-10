@@ -168,42 +168,90 @@ class RouterTest extends TestCase
 		}
 	}
 
-//	public function testShouldNotHandleUnregisteredEvents()
-//	{
-//		$router = $this->instantiate();
-//		$handler1 = new Handler('test.handler.1', function($data) {
-//			$data['count'] += 15;
-//			return $data;
-//		});
-//
-//		$events = ['test.event.1', 'test.event.2', 'test.event.3'];
-//		$router->registerHandler(['test.event.1', 'test.event.3'], $handler1);
-//
-//		foreach ($events as $event) {
-//			switch ($event) {
-//				case 'test.event.1':
-//				case 'test.event.3':
-//					$results = $router->handleEvent(new Event($event, ['count' => 1]));
-//					$this->assertEquals(16, $results['test.handler.1']['count']);
-//					break;
-//
-//				case 'test.event.2':
-//					$event = new Event($event, ['count' => 1]);
-//					$this->expectException(UnknownEventName::class);
-//					$router->handleEvent($event);
-//					break;
-//			}
-//		}
-//	}
-//
-//	public function testShouldErrorIfUnknownEventTypePassedToRouter()
-//	{
-//		$router = $this->instantiate();
-//		$eventWithNoHandler = new Event("event.no.handler", ['some' => 'data']);
-//
-//		$this->expectException(UnknownEventName::class);
-//		$router->handleEvent($eventWithNoHandler);
-//	}
+	public function testShouldNotHandleUnregisteredEvents()
+	{
+		$router = $this->instantiate();
+		$event1 = new class(0) extends Event {
+			public function __construct(
+				public readonly int $count,
+			) {
+
+			}
+		};
+
+		$event2 = new class(0) extends Event {
+			public function __construct(
+				public readonly int $countTwo,
+			) {
+
+			}
+		};
+
+		$event3 = new class(0) extends Event {
+			public function __construct(
+				public readonly int $countThree,
+			) {
+
+			}
+		};
+
+		$multiHandler = new class($event1::class, $event2::class, $event3::class) extends Handler {
+			public function __construct(
+				private $event1,
+				private $event2,
+				private $event3,
+			) {
+
+			}
+
+			// no type declaration due to use of anonymous classes
+			public function handle( $event ): TestHandlerResult
+			{
+				switch( $event::class ) {
+					case $this->event1:
+						return new TestHandlerResult($event->count + 1);
+					case $this->event2:
+						return new TestHandlerResult($event->countTwo * 5);
+					case $this->event3:
+						return new TestHandlerResult(($event->countThree + 1) * 5 );
+				}
+
+				throw new \Exception("unknown event type " . $event::class);
+			}
+		};
+
+		$events = [new $event1(5), new $event3(5), new $event2(5)];
+		$router->registerHandler([$event1::class, $event3::class], $multiHandler);
+
+		foreach ($events as $event) {
+			switch ($event::class) {
+				case $event1::class:
+					$result = $router->handleEvent($event);
+					$this->assertEquals(6, $result[$multiHandler::class]->count);
+					break;
+
+				case $event2::class:
+					$this->expectException(UnknownEventName::class);
+					$result = $router->handleEvent($event);
+					$this->assertEmpty($result);
+					break;
+
+				case $event3::class:
+					$result = $router->handleEvent($event);
+					$this->assertEquals(30, $result[$multiHandler::class]->count);
+					break;
+			}
+		}
+	}
+
+	public function testShouldErrorIfUnknownEventTypePassedToRouter()
+	{
+		$router = $this->instantiate();
+		$eventWithNoHandler = new class() extends Event {};
+
+		$this->expectException(UnknownEventName::class);
+		$router->handleEvent($eventWithNoHandler);
+	}
 
 	private function instantiate()
 	{
