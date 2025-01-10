@@ -13,7 +13,7 @@ class Router
 
 	public function __construct()
 	{
-		static::$_instance = $this;
+
 	}
 
 	/**
@@ -51,14 +51,12 @@ class Router
 		}
 	}
 
-	static public function getInstance() :? Router
+	static public function GetInstance(): Router
 	{
 		return static::$_instance = (
-		! is_null(static::$_instance)
-			?
-			static::$_instance
-			:
-			new static
+			! is_null(static::$_instance)
+				? static::$_instance
+				: new static
 		);
 	}
 

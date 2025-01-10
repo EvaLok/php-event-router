@@ -256,7 +256,19 @@ class RouterTest extends TestCase
 		$router->handleEvent($eventWithNoHandler);
 	}
 
-	private function instantiate()
+	public function testShouldInstantiateOnceFromGetInstance()
+	{
+		$instance = Router::GetInstance();
+		$this->assertInstanceOf(Router::class, $instance);
+		$this->assertEquals(0, count($instance->getHandlers()));
+
+		$sameInstance = Router::GetInstance();
+		$instance->registerHandler([TestEvent1::class], new TestHandler1());
+		$this->assertEquals(1, count($instance->getHandlers()));
+		$this->assertEquals(1, count($sameInstance->getHandlers()));
+	}
+
+	private function instantiate(): Router
 	{
 		return new Router();
 	}
