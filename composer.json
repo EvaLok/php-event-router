@@ -12,7 +12,8 @@
     "php" : ">=7.0.0"
   },
   "require-dev": {
-    "phpspec/phpspec": "~2.0"
+    "phpspec/phpspec": "~2.0",
+    "phpunit/phpunit": "~10.5"
   },
   "autoload": {
     "psr-4": {
